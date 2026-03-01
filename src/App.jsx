@@ -1,36 +1,28 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import Analytics from './pages/Analytics'
+import Login      from './pages/Login'
+import Dashboard  from './pages/Dashboard'
+import Expenses   from './pages/Expenses'
+import Analytics  from './pages/Analytics'
+import Profile    from './pages/Profile'
+import { isLoggedIn } from './api/storage'
 
-
-// Simple auth guard
-const PrivateRoute = ({ children }) => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn')
-  return isLoggedIn ? children : <Navigate to="/login" />
+// Protected route wrapper
+function Protected({ children }) {
+  return isLoggedIn() ? children : <Navigate to="/login" replace />
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
-        <Route path="/login" element={<Login />} />
-
-        {/* Protected */}
-        <Route path="/dashboard" element={
-          <PrivateRoute><Dashboard /></PrivateRoute>
-        } />
-        <Route path="/analytics" element={
-          <PrivateRoute><Analytics /></PrivateRoute>
-        } />
-
-        {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="/login"     element={<Login />} />
+        <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/expenses"  element={<Protected><Expenses /></Protected>} />
+        <Route path="/analytics" element={<Protected><Analytics /></Protected>} />
+        <Route path="/settings"  element={<Protected><Profile /></Protected>} />
+        <Route path="*"          element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
-export default App

@@ -1,25 +1,29 @@
-// Save after login
+// ─────────────────────────────────────────
+//  LocalStorage helpers for JWT auth
+// ─────────────────────────────────────────
+
+// Save token + user after login/register
 export const saveAuth = (token, user) => {
-  localStorage.setItem('token', token)
-  localStorage.setItem('user',  JSON.stringify(user))
+  localStorage.setItem('token',      token)
+  localStorage.setItem('user',       JSON.stringify(user))
   localStorage.setItem('isLoggedIn', 'true')
 }
 
-// Read token anywhere
+// Get JWT token
 export const getToken = () => localStorage.getItem('token')
 
-// Read user info
+// Get user object
 export const getUser = () => {
-  const u = localStorage.getItem('user')
-  return u ? JSON.parse(u) : null
+  const user = localStorage.getItem('user')
+  return user ? JSON.parse(user) : null
 }
 
-// Clear on logout
+// Check if logged in
+export const isLoggedIn = () => localStorage.getItem('isLoggedIn') === 'true'
+
+// Clear everything on logout
 export const clearAuth = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   localStorage.removeItem('isLoggedIn')
 }
-
-// Check if logged in
-export const isLoggedIn = () => !!localStorage.getItem('isLoggedIn')
