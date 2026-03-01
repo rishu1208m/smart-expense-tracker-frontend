@@ -1,28 +1,36 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
-import Login from "./pages/Login";
-import Analytics from "./pages/Analytics";
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Analytics from './pages/Analytics'
 
-function App() {
-  const [dark, setDark] = useState(false);
 
-  return (
-    <div className={dark ? "dark-mode" : ""}>
-      <button 
-        onClick={() => setDark(!dark)} 
-        style={{ position: "absolute", top: 10, right: 10 }}
-      >
-        Toggle Dark Mode
-      </button>
-
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/analytics" element={<Analytics />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
+// Simple auth guard
+const PrivateRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn')
+  return isLoggedIn ? children : <Navigate to="/login" />
 }
 
-export default App;
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected */}
+        <Route path="/dashboard" element={
+          <PrivateRoute><Dashboard /></PrivateRoute>
+        } />
+        <Route path="/analytics" element={
+          <PrivateRoute><Analytics /></PrivateRoute>
+        } />
+
+        {/* Default redirect */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App

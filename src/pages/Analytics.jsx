@@ -1,94 +1,53 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import DashboardLayout from "../components/DashboardLayout";   // ✅ Added
+import React from 'react'
+import Sidebar from '../components/Sidebar'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-} from "recharts";
+const data = [
+  { name: 'Travel',    value: 3200 },
+  { name: 'Food',      value: 1800 },
+  { name: 'Software',  value: 2400 },
+  { name: 'Office',    value: 900  },
+  { name: 'Marketing', value: 1500 },
+]
+const COLORS = ['#1a6bff','#00d4ff','#00c9a7','#ffb347','#ff6b9d']
 
-const Analytics = () => {
-  const [data, setData] = useState(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    axios
-      .get("http://localhost:8080/api/analytics", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { startDate, endDate },
-      })
-      .then((res) => setData(res.data))
-      .catch((err) => console.error(err));
-  }, [startDate, endDate]);
-
-  if (!data) return <p>Loading...</p>;
-
-  const categoryData = Object.entries(data.categoryTotals).map(
-    ([key, value]) => ({
-      name: key,
-      value,
-    })
-  );
-
-  const monthlyData = Object.entries(data.monthlyTotals).map(
-    ([key, value]) => ({
-      name: key,
-      value,
-    })
-  );
-
+export default function Analytics() {
   return (
-    <DashboardLayout>   {/* ✅ Wrapped with layout */}
-      <div style={{ padding: "20px" }}>
-        <h2>Total Amount: ₹{data.totalAmount}</h2>
-        <h3>Total Expenses: {data.totalExpenses}</h3>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f7ff', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <Sidebar />
+      <main style={{ flex: 1, padding: '40px 36px' }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f1c3f', letterSpacing: '-0.02em', marginBottom: 4 }}>Analytics</h1>
+        <p style={{ fontSize: 14, color: '#8892b0', marginBottom: 32 }}>Expense breakdown and trends</p>
 
-        <h3>AI Insight:</h3>
-        <p>{data.insight}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1px solid #e4e9f7' }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f1c3f', marginBottom: 20 }}>Spend by Category</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={data}>
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#8892b0' }} />
+                <YAxis tick={{ fontSize: 12, fill: '#8892b0' }} />
+                <Tooltip contentStyle={{ borderRadius: 10, fontSize: 13 }} />
+                <Bar dataKey="value" radius={[6,6,0,0]}>
+                  {data.map((_,i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            style={{ marginLeft: "10px" }}
-          />
+          <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1px solid #e4e9f7' }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f1c3f', marginBottom: 20 }}>Category Distribution</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie data={data} dataKey="value" cx="50%" cy="50%" outerRadius={80} label>
+                  {data.map((_,i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Legend />
+                <Tooltip contentStyle={{ borderRadius: 10, fontSize: 13 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-
-        <h3>Category Breakdown</h3>
-        <PieChart width={400} height={300}>
-          <Pie data={categoryData} dataKey="value" nameKey="name" outerRadius={100}>
-            {categoryData.map((entry, index) => (
-              <Cell key={index} />
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-
-        <h3 style={{ marginTop: "30px" }}>Monthly Expenses</h3>
-        <BarChart width={500} height={300} data={monthlyData}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value" />
-        </BarChart>
-      </div>
-    </DashboardLayout>
-  );
-};
-
-export default Analytics;
+      </main>
+    </div>
+  )
+}
