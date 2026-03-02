@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api' // Change to your backend URL
+const BASE_URL = 'http://smart-expense-tracker-backend-production-a4a5.up.railway.app' // Change to your backend URL
 
 export async function loginUser(email, password) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
