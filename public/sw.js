@@ -75,6 +75,6 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   if (event.action === 'dismiss') return
   event.waitUntil(
-    clients.openWindow(event.notification.data?.url || '/dashboard')
+    self.clients.openWindow(event.notification.data?.url || '/dashboard')
   )
 })
