@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────
 //  API Base URL — switches local vs production
 // ─────────────────────────────────────────
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://smart-expense-tracker-backend-production-a4a5.up.railway.app/api'
 
 // ─────────────────────────────────────────
 //  POST helper
