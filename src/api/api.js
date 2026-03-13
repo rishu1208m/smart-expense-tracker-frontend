@@ -1,35 +1,77 @@
-const BASE_URL = 'http://smart-expense-tracker-backend-production-a4a5.up.railway.app' // Change to your backend URL
+// ─────────────────────────────────────────
+//  API Base URL
+// ─────────────────────────────────────────
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://smart-expense-tracker-backend-production-a4a5.up.railway.app/api'
 
-import express from "express";
-import cors from "cors";
-import authRoutes from "./routes/authRoutes.js";
-
-const app = express();
-
-app.use(cors({
-  origin: "https://smart-expense-tracker-frontend-dun.vercel.app",
-  credentials: true
-}));
-
-app.use(express.json());
-
-app.use("/api/auth", authRoutes);
-export async function loginUser(email, password) {
-  const res = await fetch(`${BASE_URL}/auth/login`, {
+// ─────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────
+const post = async (endpoint, body, token = null) => {
+  const headers = { 'Content-Type': 'application/json' }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    headers,
+    body: JSON.stringify(body),
   })
-  if (!res.ok) throw new Error('Login failed')
-  return res.json() // Returns { token, user }
-}
-
-export async function registerUser(data) {
-  const res = await fetch(`${BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
-  if (!res.ok) throw new Error('Registration failed')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Something went wrong' }))
+    throw new Error(err.message || 'Request failed')
+  }
   return res.json()
 }
+
+const get = async (endpoint, token) => {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  if (!res.ok) throw new Error('Request failed')
+  return res.json()
+}
+
+const del = async (endpoint, token) => {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  if (!res.ok) throw new Error('Delete failed')
+  return res
+}
+
+const put = async (endpoint, body, token) => {
+  const headers = { 'Content-Type': 'application/json' }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error('Update failed')
+  return res.json()
+}
+
+// ─────────────────────────────────────────
+//  Auth
+// ─────────────────────────────────────────
+export const loginUser    = (email, password) => post('/auth/login',    { email, password })
+export const registerUser = (data)            => post('/auth/register', data)
+
+// ─────────────────────────────────────────
+//  Expenses
+// ─────────────────────────────────────────
+export const getExpenses   = (token)           => get('/expenses',        token)
+export const addExpense    = (data, token)     => post('/expenses',        data, token)
+export const updateExpense = (id, data, token) => put(`/expenses/${id}`,  data, token)
+export const deleteExpense = (id, token)       => del(`/expenses/${id}`,  token)
+
+// ─────────────────────────────────────────
+//  Budget
+// ─────────────────────────────────────────
+export const getBudget = (token)       => get('/budget',  token)
+export const setBudget = (data, token) => post('/budget', data, token)
+
+// ─────────────────────────────────────────
+//  Dashboard & Analytics
+// ─────────────────────────────────────────
+export const getDashboard = (token) => get('/dashboard', token)
+export const getAnalytics = (token) => get('/analytics', token)
