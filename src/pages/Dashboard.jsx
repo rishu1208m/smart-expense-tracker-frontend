@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import ExpenseCard from '../components/ExpenseCard'
 import AddExpenseModal from '../components/AddExpenseModal'
-import { getDashboard } from '../api/auth'
+import { getDashboard } from '../api/api'
 import { getToken, getUser } from '../api/storage'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
