@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
-import { getAnalytics } from '../api/auth'
+import { getAnalytics } from '../api/api'
 import { getToken } from '../api/storage'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
@@ -38,7 +38,7 @@ export default function Analytics() {
       .then(d  => setData(d))
       .catch(e => setError(e.message))
       .finally(()=> setLoading(false))
-  }, [])
+  }, [token])
 
   // Prepare chart data
   const categoryData = data?.categoryBreakdown

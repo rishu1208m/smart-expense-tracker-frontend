@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import AddExpenseModal from '../components/AddExpenseModal'
-import { getExpenses, deleteExpense } from '../api/auth'
+import { getExpenses, deleteExpense } from '../api/api'
 import { getToken } from '../api/storage'
 
 const CATEGORY_COLORS = {
@@ -27,15 +27,13 @@ export default function Expenses() {
   const [filterCat,  setFilterCat]  = useState('All')
   const token = getToken()
 
-  const fetchExpenses = () => {
+  useEffect(() => {
     setLoading(true)
     getExpenses(token)
       .then(data => setExpenses(Array.isArray(data) ? data : []))
       .catch(e   => setError(e.message))
       .finally(()=> setLoading(false))
-  }
-
-  useEffect(() => { fetchExpenses() }, [])
+  }, [token])
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this expense?')) return
@@ -250,7 +248,15 @@ export default function Expenses() {
       {showModal && (
         <AddExpenseModal
           onClose={()=>setShowModal(false)}
-          onAdded={()=>{ setShowModal(false); fetchExpenses() }}
+          onAdded={()=>{
+            setShowModal(false)
+            // Refetch expenses after adding
+            setLoading(true)
+            getExpenses(token)
+              .then(data => setExpenses(Array.isArray(data) ? data : []))
+              .catch(e   => setError(e.message))
+              .finally(()=> setLoading(false))
+          }}
         />
       )}
     </div>

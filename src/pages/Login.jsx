@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { loginUser, registerUser } from '../api/auth'
+import { loginUser, registerUser } from '../api/api'
 import { saveAuth } from '../api/storage'
 
 /* ─────────────────────────────────────────
